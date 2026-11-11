@@ -6,7 +6,9 @@ Multi Modal AI brings three modalities together behind a single authenticated we
 
 > Formerly developed under the working name *ExcellenceTech RAG Project*; the application has since grown beyond RAG into a multimodal platform covering text, image, and document understanding.
 
-[Quick start](#quick-start) · [Configuration](#configuration) · [API](#api) · [Deployment](#deployment) · [Current limitations](#current-limitations)
+**Live Demo:** <http://116.202.210.102:20300> — open it in your browser and create an account to try Q&A, Content Studio, and Documents/OCR. *(Demo runs over HTTP on a server IP; use non-sensitive data.)*
+
+[Live Demo](http://116.202.210.102:20300) · [Quick start](#quick-start) · [Configuration](#configuration) · [API](#api) · [Deployment](#deployment) · [Current limitations](#current-limitations)
 
 ## What you can do
 
