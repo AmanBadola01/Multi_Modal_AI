@@ -13,4 +13,6 @@ backend/data/ocr_rag_docs/
 frontend/ocr_preview.html
 frontend/screenshot_review.png
 *.log
+docs/
+doc/
 
