@@ -1,18 +1,15 @@
 """
-Security helpers: JWT authentication, Turnstile CAPTCHA verification, and auth dependencies.
+Security helpers: JWT authentication and auth dependencies.
 """
 
 import datetime as dt
-import json
-import urllib.parse
-import urllib.request
 
 import bcrypt
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from core.config import JWT_ALGORITHM, JWT_EXPIRE_HOURS, JWT_SECRET, TURNSTILE_SECRET_KEY
+from core.config import JWT_ALGORITHM, JWT_EXPIRE_HOURS, JWT_SECRET
 
 bearer = HTTPBearer()
 
@@ -44,9 +41,3 @@ def get_current_user(creds: HTTPAuthorizationCredentials = Depends(bearer)) -> d
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid or expired token.")
     return {"user_id": str(payload["sub"]), "email": payload.get("email")}
-
-
-def verify_turnstile(token: str | None) -> bool:
-    """Verifies Cloudflare Turnstile token on the server side. Currently bypassed for seamless workflow."""
-    return True
-

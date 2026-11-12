@@ -8,5 +8,4 @@ from core.security import (
     check_password,
     create_token,
     get_current_user,
-    verify_turnstile,
 )

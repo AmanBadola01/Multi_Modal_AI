@@ -10,7 +10,7 @@ from pydantic import BaseModel
 import os
 from core.config import ALLOWED_ORIGINS, DATA_DIR
 from core.database import init_core_db
-from core.security import create_token, get_current_user, verify_turnstile
+from core.security import create_token, get_current_user
 from core.auth import create_user, verify_user
 from rag.memory import init_rag_db
 from rag.pipeline import RAGPipeline
@@ -63,7 +63,6 @@ class Credentials(BaseModel):
 class LoginBody(BaseModel):
     email: str
     password: str
-    turnstile_token: str | None = None
 
 
 def _token_response(user_id: str, email: str) -> dict:
@@ -88,11 +87,6 @@ def signup(body: Credentials):
 
 @auth_router.post("/login")
 def login(body: LoginBody):
-    if not verify_turnstile(body.turnstile_token):
-        raise HTTPException(
-            status_code=400,
-            detail="Security check failed. Please verify that you are human.",
-        )
     user_id = verify_user(body.email, body.password)
     if not user_id:
         raise HTTPException(status_code=401, detail="Wrong email or password.")

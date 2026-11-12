@@ -22,9 +22,6 @@ JWT_SECRET = os.getenv("JWT_SECRET", "dev-secret-key-change-in-production")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRE_HOURS = 24 * 7  # 7 days
 
-# Cloudflare Turnstile
-TURNSTILE_SECRET_KEY = os.getenv("TURNSTILE_SECRET_KEY")
-
 # LLM configuration
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")

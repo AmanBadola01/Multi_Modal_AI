@@ -1,10 +1,9 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { useAuth } from "@/context/AuthContext";
 import { errorMessage } from "@/lib/api";
 import { Logo } from "@/components/Logo";
-import { TurnstileWidget, type TurnstileRef } from "@/components/TurnstileWidget";
 import { cn } from "@/lib/utils";
 
 const inputClasses =
@@ -19,11 +18,6 @@ export function AuthPage() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  // Cloudflare Turnstile token & ref (login only)
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const turnstileRef = useRef<TurnstileRef>(null);
-  const siteKey = ((import.meta as any).env?.VITE_TURNSTILE_SITE_KEY as string | undefined) || "";
 
   // Password validation rules for sign up
   const passwordRequirements = [
@@ -65,15 +59,11 @@ export function AuthPage() {
 
     setLoading(true);
     try {
-      if (mode === "login") await login(email.trim(), password, turnstileToken);
+      if (mode === "login") await login(email.trim(), password);
       else await signup(email.trim(), password);
       navigate({ to: "/", replace: true });
     } catch (err) {
       setError(errorMessage(err));
-      if (mode === "login") {
-        turnstileRef.current?.reset();
-        setTurnstileToken(null);
-      }
     } finally {
       setLoading(false);
     }
@@ -105,8 +95,6 @@ export function AuthPage() {
                 onClick={() => {
                   setMode(m);
                   setError(null);
-                  setTurnstileToken(null);
-                  turnstileRef.current?.reset();
                 }}
                 className={cn(
                   "rounded-md px-3 py-1.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",

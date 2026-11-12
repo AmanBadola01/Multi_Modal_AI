@@ -153,10 +153,10 @@ export const api = {
   signup: (email: string, password: string) =>
     request("/api/auth/signup", { method: "POST", body: { email, password } }),
 
-  login: (email: string, password: string, turnstile_token?: string | null) =>
+  login: (email: string, password: string) =>
     request("/api/auth/login", {
       method: "POST",
-      body: { email, password, ...(turnstile_token ? { turnstile_token } : {}) },
+      body: { email, password },
     }),
 
   me: () => request("/api/auth/me"),

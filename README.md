@@ -18,7 +18,7 @@ Multi Modal AI brings three modalities together behind a single authenticated we
 | **Content Studio** | Maintain company information, projects, and brand voices; generate and repurpose content. | Groq-powered generation with SQLite storage. |
 | **Documents / OCR** | Upload images or PDFs, extract fields and tables, review bounding boxes, correct results, and export JSON, CSV, or Excel. | OpenCV preprocessing, EasyOCR text recognition, Gemini vision extraction, and a review interface. Approved results can be appended to the active Q&A index. |
 
-Authentication uses email/password accounts, bcrypt password hashing, and JWTs. Cloudflare Turnstile is optional for local development and required by the backend in production mode.
+Authentication uses email/password accounts, bcrypt password hashing, and JWTs.
 
 ## Technology and structure
 
@@ -101,7 +101,7 @@ Generate a signing secret locally and paste it into your private `.env` file:
 python -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
-Keep `APP_ENV=development` and leave Turnstile unset for local use. Backend `.env` files and credentials are ignored by Git.
+Keep `APP_ENV=development` for local use. Backend `.env` files and credentials are ignored by Git.
 
 ### 3. Start the backend
 
@@ -151,11 +151,9 @@ Backend settings load from the process environment first, then `backend/.env`, t
 | `GROQ_MODEL_FAST` | Short-form and repurposing model; default `openai/gpt-oss-20b`. |
 | `GROQ_MODEL_QUALITY` | Long-form model; default `openai/gpt-oss-120b`. |
 | `JWT_SECRET` | Stable token-signing secret. Production requires at least 32 characters. Development generates a temporary secret if unset, invalidating tokens after a restart. |
-| `APP_ENV` | Defaults to `development`. `production` enforces required backend credentials and Turnstile configuration. |
+| `APP_ENV` | Defaults to `development`. `production` enforces required backend credentials. |
 | `APP_DATA_DIR` | Defaults to `backend/data`. Holds `app.db`, OCR uploads, and extracted text. With a custom directory, copy `company_policy.txt` into it before startup to initialize Q&A. |
 | `ALLOWED_ORIGINS` | Comma-separated CORS allowlist for direct browser-to-backend access. The template includes local port 5178; the default same-origin proxy does not require CORS. |
-| `TURNSTILE_SECRET_KEY` | Backend Turnstile verification secret. Pair with the frontend site key. |
-| `VITE_TURNSTILE_SITE_KEY` | Public frontend Turnstile key. Set before frontend build; rebuild after changing it. |
 | `VITE_API_URL` | Optional public API origin; empty uses the same-origin `/api` proxy. |
 | `BACKEND_URL` | Frontend server/proxy target; defaults to `http://127.0.0.1:8092`. Set in the frontend process environment when overriding. |
 
@@ -207,11 +205,11 @@ A devcontainer is included with Python 3.12, Node 22, and forwarded ports 5178/8
 
 ## Deployment
 
-Review the limitations below before exposing a deployment to other users. Use HTTPS, private backend access, persistent data storage, and a host secret manager. Set production Turnstile keys for the actual public hostname.
+Review the limitations below before exposing a deployment to other users. Use HTTPS, private backend access, persistent data storage, and a host secret manager.
 
 ### Docker Compose
 
-The included Compose configuration requires `GEMINI_API_KEY`, `GROQ_API_KEY`, `JWT_SECRET`, `TURNSTILE_SECRET_KEY`, and `VITE_TURNSTILE_SITE_KEY` in its environment or a private repository-root `.env`. The site key is passed as a frontend build argument. Backend `.env` is not used for Compose interpolation.
+The included Compose configuration requires `GEMINI_API_KEY`, `GROQ_API_KEY`, and `JWT_SECRET` in its environment or a private repository-root `.env`. Backend `.env` is not used for Compose interpolation.
 
 The frontend is published at `127.0.0.1:5178` on the Docker host; the backend is internal to the Compose network. Put a reverse proxy in front of the frontend for remote HTTPS access. [`deploy/Caddyfile.example`](deploy/Caddyfile.example) is an example, not evidence that a proxy is installed or configured on your host.
 
@@ -235,7 +233,7 @@ pm2 start ecosystem.config.js
 pm2 status
 ```
 
-The checked-in configuration binds the backend to `127.0.0.1:8092` and the frontend to `0.0.0.0:20300`. Review these settings and your firewall/reverse proxy for your own host. Set `VITE_TURNSTILE_SITE_KEY` during the build, and `BACKEND_URL` in the production frontend server environment when using another backend address.
+The checked-in configuration binds the backend to `127.0.0.1:8092` and the frontend to `0.0.0.0:20300`. Review these settings and your firewall/reverse proxy for your own host. Set `BACKEND_URL` in the production frontend server environment when using another backend address.
 
 ## Troubleshooting
 
@@ -245,7 +243,6 @@ The checked-in configuration binds the backend to `127.0.0.1:8092` and the front
 | Gemini returns a model or permission error | Set `GEMINI_MODEL` to a model your account can access, check API permissions/quota, and restart the backend. |
 | Frontend reports a backend connection error | Confirm the backend completed startup on port 8092; check `BACKEND_URL` if overriding the default. |
 | Port 5178 is occupied | Stop your own conflicting process or select another Vite port with `npm run dev -- --port <port>`. Update direct-access CORS settings if needed. |
-| Sign-in security check fails | Configure both Turnstile keys for the hostname, or leave both unset in local development. Production requires them. |
 | Q&A says no document is indexed | Ensure `company_policy.txt` exists in `APP_DATA_DIR` and restart. |
 | Content generation fails | Check `GROQ_API_KEY`, model access, and provider quota. |
 | OCR is slow on first use | Allow the recognition model to download. CPU OCR and multi-page PDFs take longer than plain-text retrieval. |
